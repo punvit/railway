@@ -44,3 +44,12 @@ ENV/
 
 # Pytest
 .pytest_cache/
+
+# Node
+node_modules/
+dist/
+npm-debug.log
+yarn-error.log
+.env
+.DS_Store
+coverage/
