@@ -28,12 +28,12 @@ class Settings(BaseSettings):
 
     @property
     def async_database_url(self) -> str:
-        """Ensure database URL uses asyncpg driver."""
+        """Ensure database URL uses psycopg (v3) driver."""
         url = self.database_url
         if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-        elif url.startswith("postgresql://") and "+asyncpg" not in url:
-             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            url = url.replace("postgres://", "postgresql+psycopg://", 1)
+        elif url.startswith("postgresql://") and "+psycopg" not in url:
+             url = url.replace("postgresql://", "postgresql+psycopg://", 1)
         return url
 
 
