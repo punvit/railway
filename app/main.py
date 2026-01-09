@@ -26,16 +26,37 @@ async def lifespan(app: FastAPI):
     """Application lifespan handler."""
     # Startup
     logger.info("Starting Hotel Channel Manager...")
-    await init_db()
-    logger.info("Database initialized")
+    
+    # Import models to ensure tables are registered with Base.metadata
+    from app import models  # noqa
+    
+    # Log config (careful to mask secrets)
+    safe_db_url = settings.database_url.replace(
+        settings.database_url.split("@")[0].split("//")[1].split(":")[1], 
+        "******"
+    ) if "@" in settings.database_url and ":" in settings.database_url.split("@")[0] else "Unknown"
+    
+    logger.info(f"Connecting to Database: {safe_db_url}")
+    logger.info(f"Connecting to Redis: {settings.redis_url}")
+
+    try:
+        await init_db()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.error(f"Failed to initialize database: {e}")
+        # We don't raise here so the app can start and show health check errors
+        # In production this might be bad, but for debugging deployment it's crucial
     
     yield
     
     # Shutdown
     logger.info("Shutting down...")
-    lock_manager = get_lock_manager()
-    await lock_manager.close()
-    logger.info("Redis connection closed")
+    try:
+        lock_manager = get_lock_manager()
+        await lock_manager.close()
+        logger.info("Redis connection closed")
+    except Exception as e:
+        logger.error(f"Error closing Redis connection: {e}")
 
 
 app = FastAPI(
