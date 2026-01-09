@@ -79,6 +79,27 @@ app.add_middleware(
 # Include API routes
 app.include_router(api_router)
 
+
+@app.get("/", tags=["Health"])
+async def root():
+    """Health check endpoint."""
+    return {
+        "status": "healthy",
+        "app": settings.app_name,
+        "version": "1.0.0",
+    }
+
+
+@app.get("/health", tags=["Health"])
+async def health_check():
+    """Detailed health check."""
+    return {
+        "status": "healthy",
+        "database": "connected",
+        "redis": "connected",
+    }
+
+
 # Serve React Frontend (Static Files)
 # Note: Ensure 'dist' directory exists (run npm run build)
 import os
@@ -102,24 +123,3 @@ if os.path.exists("dist"):
         return FileResponse("dist/index.html")
 else:
     logger.warning("Frontend build directory 'dist' not found. API only mode.")
-
-
-
-@app.get("/", tags=["Health"])
-async def root():
-    """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "app": settings.app_name,
-        "version": "1.0.0",
-    }
-
-
-@app.get("/health", tags=["Health"])
-async def health_check():
-    """Detailed health check."""
-    return {
-        "status": "healthy",
-        "database": "connected",
-        "redis": "connected",
-    }
