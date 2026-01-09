@@ -11,4 +11,3 @@ icalendar==5.0.11
 httpx==0.25.2
 pytest==7.4.4
 pytest-asyncio==0.23.2
-greenlet==3.0.3
