@@ -55,7 +55,33 @@ app.add_middleware(
 )
 
 # Include API routes
+# Include API routes
 app.include_router(api_router)
+
+# Serve React Frontend (Static Files)
+# Note: Ensure 'dist' directory exists (run npm run build)
+import os
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+# Check if dist directory exists (for production)
+if os.path.exists("dist"):
+    app.mount("/assets", StaticFiles(directory="dist/assets"), name="assets")
+
+    @app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """Serve React frontend for any unmatched route."""
+        # API routes are already handled above
+        # If file exists in dist, serve it
+        possible_file = os.path.join("dist", full_path)
+        if os.path.isfile(possible_file):
+            return FileResponse(possible_file)
+        
+        # Otherwise serve index.html (SPA routing)
+        return FileResponse("dist/index.html")
+else:
+    logger.warning("Frontend build directory 'dist' not found. API only mode.")
+
 
 
 @app.get("/", tags=["Health"])
