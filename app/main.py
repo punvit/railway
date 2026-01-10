@@ -76,7 +76,7 @@ app.add_middleware(
 )
 
 # Redirect www to root domain and redirect root domain to www
-from fastapi.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
