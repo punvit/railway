@@ -75,6 +75,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Redirect www to root domain and redirect root domain to www
+from fastapi.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import RedirectResponse
+
+class RedirectWWWMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        """Redirect booknhost.info to www.booknhost.info"""
+        host = request.headers.get("host", "")
+        # Redirect root domain to www subdomain
+        if host == "booknhost.info":
+            # Preserve the path and query string
+            url = request.url.replace(netloc="www.booknhost.info")
+            return RedirectResponse(url=url, status_code=301)
+        return await call_next(request)
+
+app.add_middleware(RedirectWWWMiddleware)
+
 # Include API routes
 # Include API routes
 app.include_router(api_router)
